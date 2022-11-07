@@ -2,8 +2,24 @@
   "name": "request-address",
   "version": "0.0.1",
   "description": "Request bitcoin address api messages",
+  "keywords": [
+    "bitcoin",
+    "address",
+    "request",
+    "protocol"
+  ],
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "repository": "https://github.com/pocketbitcoin/request-address.git",
+  "homepage": "https://github.com/pocketbitcoin/request-address",
+  "bugs": {
+    "url": "https://github.com/pocketbitcoin/request-address/issues"
+  },
   "author": "David Knezić <davidknezic@gmail.com>",
   "license": "MIT",
   "scripts": {
