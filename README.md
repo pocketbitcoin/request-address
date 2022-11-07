@@ -18,7 +18,7 @@ A service or wallet requests a bitcoin address request `requestAddress`:
   "type": "requestAddress",
   "withMessageSignature": "SX0KOveC",
   "withExtendedPublicKey": true,
-  "withScriptType": "p2sh"
+  "withScriptType": "p2wpkh"
 }
 ```
 
@@ -31,7 +31,7 @@ The other service or wallet replies with the requested `address`:
   "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
   "signature": "Hzqs3cyg1YYF7M/m+U3BbDFykpZELv4xQhk4uWGCGAoOOq3kYKcR3uUzhXludmyEjQct7rAx3NxrWDBUmWcs/B8=",
   "extendedPublicKey": "zpub6rjWsJX5PFBXVAivrvSX7QUwtHKPuudSYokPBiA35H6g6ue4YaLPNQYhSkiL1G8zGAhQNuiMi15k4xMKBy4jHPj99uWDnKihRuvGDycEGiD"
-};
+}
 ```
 
 ## API
