@@ -1,6 +1,6 @@
 {
   "name": "request-address",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Request bitcoin address api messages",
   "main": "dist/index.js",
   "repository": "https://github.com/pocketbitcoin/request-address.git",
