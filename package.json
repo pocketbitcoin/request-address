@@ -1,0 +1,18 @@
+{
+  "name": "request-address",
+  "version": "0.0.0",
+  "description": "Request bitcoin address api messages",
+  "main": "dist/index.js",
+  "repository": "https://github.com/pocketbitcoin/request-address.git",
+  "author": "David Knezić <davidknezic@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "yarn tsc --watch",
+    "build": "tsc",
+    "prepublish": "npm run build",
+    "test": "echo \"Error: no tests available yet\" && exit 1"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
