@@ -6,6 +6,7 @@ export enum MessageVersion {
 
 export enum V0MessageType {
   RequestAddress = 'requestAddress',
+  VerifyAddress = 'verifyAddress',
   Address = 'address',
 }
 
@@ -24,6 +25,12 @@ export type RequestAddressV0Message = {
   withScriptType?: RequestAddressV0MessageScriptType | null,
 };
 
+export type VerifyAddressV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.VerifyAddress,
+  bitcoinAddress: string,
+};
+
 export type AddressV0Message = {
   version: MessageVersion.V0,
   type: V0MessageType.Address,
@@ -34,6 +41,7 @@ export type AddressV0Message = {
 
 export type Message =
   | RequestAddressV0Message
+  | VerifyAddressV0Message
   | AddressV0Message;
 
 export function serializeMessage(message: Message) {
@@ -60,59 +68,69 @@ export function parseMessage(value: any): Message {
   if (isLiteral(version, MessageVersion.V0 as const)) {
     const { type } = object;
 
-    if (!isOneOf(type, V0MessageType.RequestAddress, V0MessageType.Address)) {
+    if (!isOneOf(type, V0MessageType.RequestAddress, V0MessageType.VerifyAddress, V0MessageType.Address)) {
       throw new Error('invalid type');
     }
 
-    switch (type) {
-      case V0MessageType.RequestAddress:
-        const { withMessageSignature } = object;
-        if (!isString(withMessageSignature) && !isNullish(withMessageSignature)) {
-          throw new Error('message signature indicator invalid');
-        }
+    if (type === V0MessageType.RequestAddress) {
+      const { withMessageSignature } = object;
+      if (!isString(withMessageSignature) && !isNullish(withMessageSignature)) {
+        throw new Error('message signature indicator invalid');
+      }
 
-        const { withExtendedPublicKey } = object;
-        if (!isBoolean(withExtendedPublicKey) && !isNullish(withExtendedPublicKey)) {
-          throw new Error('extended public key indicator invalid');
-        }
+      const { withExtendedPublicKey } = object;
+      if (!isBoolean(withExtendedPublicKey) && !isNullish(withExtendedPublicKey)) {
+        throw new Error('extended public key indicator invalid');
+      }
 
-        const { withScriptType } = object;
-        if (!isOneOf(withScriptType, ...Object.values(RequestAddressV0MessageScriptType)) && !isNullish(withScriptType)) {
-          throw new Error('script type indicator invalid');
-        }
+      const { withScriptType } = object;
+      if (!isOneOf(withScriptType, ...Object.values(RequestAddressV0MessageScriptType)) && !isNullish(withScriptType)) {
+        throw new Error('script type indicator invalid');
+      }
 
-        return {
-          version,
-          type,
-          withMessageSignature, // !true
-          withExtendedPublicKey,
-          withScriptType,
-        };
-      case V0MessageType.Address:
-        const { bitcoinAddress } = object;
-        if (!isString(bitcoinAddress)) {
-          throw new Error('bitcoin address missing');
-        }
+      return {
+        version,
+        type,
+        withMessageSignature, // !true
+        withExtendedPublicKey,
+        withScriptType,
+      };
+    } else if (type === V0MessageType.VerifyAddress) {
+      const { bitcoinAddress } = object;
+      if (!isString(bitcoinAddress)) {
+        throw new Error('bitcoin address missing');
+      }
 
-        const { signature } = object;
-        if (!isString(signature) && !isNullish(signature)) {
-          throw new Error('signature invalid');
-        }
+      return {
+        version,
+        type,
+        bitcoinAddress,
+      };
+    } else if (type === V0MessageType.Address) {
+      const { bitcoinAddress } = object;
+      if (!isString(bitcoinAddress)) {
+        throw new Error('bitcoin address missing');
+      }
 
-        const { extendedPublicKey } = object;
-        if (!isString(extendedPublicKey) && !isNullish(extendedPublicKey)) {
-          throw new Error('extended public key invalid');
-        }
+      const { signature } = object;
+      if (!isString(signature) && !isNullish(signature)) {
+        throw new Error('signature invalid');
+      }
 
-        return {
-          version,
-          type,
-          bitcoinAddress,
-          signature,
-          extendedPublicKey,
-        };
-        default:
-          throw new Error('unsupported type');
+      const { extendedPublicKey } = object;
+      if (!isString(extendedPublicKey) && !isNullish(extendedPublicKey)) {
+        throw new Error('extended public key invalid');
+      }
+
+      return {
+        version,
+        type,
+        bitcoinAddress,
+        signature,
+        extendedPublicKey,
+      };
+    } else {
+      throw new Error('unsupported type');
     }
   }
 

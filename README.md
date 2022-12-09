@@ -34,6 +34,16 @@ The other service or wallet replies with the requested `address`:
 }
 ```
 
+A user can be prompted to verify received address with `verifyAddress`:
+
+```json
+{
+  "version": "0",
+  "type": "verifyAddress",
+  "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge"
+}
+```
+
 ## API
 
 ### `serializeMessage(message: Message): string`
@@ -51,6 +61,7 @@ The other service or wallet replies with the requested `address`:
 ```ts
 type Message =
   | RequestAddressV0Message
+  | VerifyAddressV0Message
   | AddressV0Message;
 ```
 
@@ -63,6 +74,16 @@ type RequestAddressV0Message = {
   withMessageSignature?: string | false | null,
   withExtendedPublicKey?: boolean | null,
   withScriptType?: RequestAddressV0MessageScriptType | null,
+};
+```
+
+### `VerifyAddressV0Message`
+
+```ts
+type VerifyAddressV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.VerifyAddress,
+  bitcoinAddress: string,
 };
 ```
 
@@ -94,6 +115,7 @@ enum RequestAddressV0MessageScriptType {
 ```ts
 enum V0MessageType {
   RequestAddress = 'requestAddress',
+  VerifyAddress = 'verifyAddress',
   Address = 'address',
 }
 ```
