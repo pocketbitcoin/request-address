@@ -44,6 +44,26 @@ A user can be prompted to verify received address with `verifyAddress`:
 }
 ```
 
+A service or wallet can also request an extended public key `requestExtendedPublicKey`:
+
+```json
+{
+  "version": "0",
+  "type": "requestExtendedPublicKey",
+  "withScriptType": "p2wpkh"
+}
+```
+
+The other service or wallet replies with the requested `extendedPublicKey`:
+
+```json
+{
+  "version": "0",
+  "type": "extendedPublicKey",
+  "extendedPublicKey": "zpub6rjWsJX5PFBXVAivrvSX7QUwtHKPuudSYokPBiA35H6g6ue4YaLPNQYhSkiL1G8zGAhQNuiMi15k4xMKBy4jHPj99uWDnKihRuvGDycEGiD"
+}
+```
+
 ## API
 
 ### `serializeMessage(message: Message): string`
@@ -61,8 +81,10 @@ A user can be prompted to verify received address with `verifyAddress`:
 ```ts
 type Message =
   | RequestAddressV0Message
+  | RequestExtendedPublicKeyV0Message
   | VerifyAddressV0Message
-  | AddressV0Message;
+  | AddressV0Message
+  | ExtendedPublicKeyV0Message;
 ```
 
 ### `RequestAddressV0Message`
@@ -73,7 +95,17 @@ type RequestAddressV0Message = {
   type: V0MessageType.RequestAddress,
   withMessageSignature?: string | false | null,
   withExtendedPublicKey?: boolean | null,
-  withScriptType?: RequestAddressV0MessageScriptType | null,
+  withScriptType?: V0MessageScriptType | null,
+};
+```
+
+### `RequestExtendedPublicKeyV0Message`
+
+```ts
+type RequestExtendedPublicKeyV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.RequestExtendedPublicKey,
+  withScriptType?: V0MessageScriptType | null,
 };
 ```
 
@@ -99,10 +131,20 @@ type AddressV0Message = {
 };
 ```
 
-### `RequestAddressV0MessageScriptType`
+### `ExtendedPublicKeyV0Message`
 
 ```ts
-enum RequestAddressV0MessageScriptType {
+type ExtendedPublicKeyV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.ExtendedPublicKey,
+  extendedPublicKey: string,
+};
+```
+
+### `V0MessageScriptType`
+
+```ts
+enum V0MessageScriptType {
   P2PKH = 'p2pkh',
   P2WPKH = 'p2wpkh',
   P2SH = 'p2sh',
