@@ -84,7 +84,7 @@ export function parseMessage(value: any): Message {
   if (isLiteral(version, MessageVersion.V0 as const)) {
     const { type } = object;
 
-    if (!isOneOf(type, V0MessageType.RequestAddress, V0MessageType.VerifyAddress, V0MessageType.Address)) {
+    if (!isOneOf(type, ...Object.values(V0MessageType))) {
       throw new Error('invalid type');
     }
 
