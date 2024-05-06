@@ -1,12 +1,13 @@
 # `request-address`
 
-> Defines a JSON-based protocol for requesting bitcoin addresses
+> Defines a JSON-based protocol for requesting bitcoin addresses and more
 
 * 👌 Simple
 * 🗓️ Versioned
 * 🍡 Supports script types
 * 🖋️ Supports message signatures
 * 👩‍🚀 Supports extended public keys
+* 💸 Supports SLIP-0024 payment requests
 
 ## Example
 
@@ -64,6 +65,32 @@ The other service or wallet replies with the requested `extendedPublicKey`:
 }
 ```
 
+A service or wallet sends a `paymentRequest`:
+
+```json
+{
+  "version": "0",
+  "type": "paymentRequest",
+  "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
+  "amount": 0.01,
+  "label": "Dragon's Tale",
+  "message": "Elderberries",
+  "slip24": {
+    "recipientName": "Dragon's Tale",
+    "nonce": null,
+    "memos": [{
+      "type": "text",
+      "text": "Elderberries"
+    }],
+    "outputs": [{
+      "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
+      "amount": 1000000
+    }],
+    "signature": "MEQCIH+0V4j4DTzT4y9EE9XHjQlyRfwHnnVQL9NFFYVCta1PAiAW0mlS4YtDzNzwJ0gR8ApKzdIKmSBKzClnxyFFp84oig=="
+  }
+}
+```
+
 ## API
 
 ### `serializeMessage(message: Message): string`
@@ -84,7 +111,8 @@ type Message =
   | RequestExtendedPublicKeyV0Message
   | VerifyAddressV0Message
   | AddressV0Message
-  | ExtendedPublicKeyV0Message;
+  | ExtendedPublicKeyV0Message
+  | PaymentRequestV0Message;
 ```
 
 ### `RequestAddressV0Message`
@@ -141,6 +169,20 @@ type ExtendedPublicKeyV0Message = {
 };
 ```
 
+### `PaymentRequestV0Message`
+
+```ts
+type PaymentRequestV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.PaymentRequest,
+  bitcoinAddress: string,
+  amount: number,
+  label: string | null,
+  message: string | null,
+  slip24: Slip24 | null,
+};
+```
+
 ### `V0MessageScriptType`
 
 ```ts
@@ -157,8 +199,11 @@ enum V0MessageScriptType {
 ```ts
 enum V0MessageType {
   RequestAddress = 'requestAddress',
+  RequestExtendedPublicKey = 'requestExtendedPublicKey',
   VerifyAddress = 'verifyAddress',
   Address = 'address',
+  ExtendedPublicKey = 'extendedPublicKey',
+  PaymentRequest = 'paymentRequest',
 }
 ```
 
@@ -168,6 +213,34 @@ enum V0MessageType {
 enum MessageVersion {
   V0 = '0',
 }
+```
+
+### `Slip24`
+
+```ts
+type Slip24 = {
+  recipientName: string,
+  nonce: string | null,
+  memos: Array<{
+    type: 'text',
+    text: string,
+  } | {
+    type: 'refund',
+    refund: string,
+  } | {
+    type: 'coinPurchase',
+    coinPurchase: {
+      coinType: number,
+      amount: string,
+      bitcoinAddress: string,
+    },
+  }>,
+  outputs: Array<{
+    amount: number,
+    bitcoinAddress: string,
+  }>,
+  signature: string,
+};
 ```
 
 ## License

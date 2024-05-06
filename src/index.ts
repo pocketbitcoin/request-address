@@ -1,4 +1,5 @@
-import { isBoolean, isLiteral, isNullish, isObject, isOneOf, isString } from './utils';
+import { parseSlip24, type Slip24 } from './slip24';
+import { isBoolean, isLiteral, isNull, isNullish, isNumber, isObject, isOneOf, isString } from './utils';
 
 export enum MessageVersion {
   V0 = '0',
@@ -10,6 +11,7 @@ export enum V0MessageType {
   VerifyAddress = 'verifyAddress',
   Address = 'address',
   ExtendedPublicKey = 'extendedPublicKey',
+  PaymentRequest = 'paymentRequest',
 }
 
 export enum V0MessageScriptType {
@@ -53,12 +55,23 @@ export type ExtendedPublicKeyV0Message = {
   extendedPublicKey: string,
 };
 
+export type PaymentRequestV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.PaymentRequest,
+  bitcoinAddress: string,
+  amount: number,
+  label: string | null,
+  message: string | null,
+  slip24: Slip24 | null,
+};
+
 export type Message =
   | RequestAddressV0Message
   | RequestExtendedPublicKeyV0Message
   | VerifyAddressV0Message
   | AddressV0Message
-  | ExtendedPublicKeyV0Message;
+  | ExtendedPublicKeyV0Message
+  | PaymentRequestV0Message;
 
 export function serializeMessage(message: Message) {
   return JSON.stringify(message);
@@ -166,6 +179,38 @@ export function parseMessage(value: any): Message {
         version,
         type,
         extendedPublicKey,
+      };
+    } else if (type === V0MessageType.PaymentRequest) {
+      const { bitcoinAddress } = object;
+      if (!isString(bitcoinAddress)) {
+        throw new Error('bitcoin address invalid');
+      }
+
+      const { amount } = object;
+      if (!isNumber(amount)) {
+        throw new Error('amount invalid');
+      }
+
+      const { label } = object;
+      if (!isString(label) && !isNull(label)) {
+        throw new Error('label invalid');
+      }
+
+      const { message } = object;
+      if (!isString(message) && !isNull(message)) {
+        throw new Error('message invalid');
+      }
+
+      const { slip24 } = object;
+
+      return {
+        version,
+        type,
+        bitcoinAddress,
+        amount,
+        label,
+        message,
+        slip24: parseSlip24(slip24)
       };
     } else {
       throw new Error('unsupported type');

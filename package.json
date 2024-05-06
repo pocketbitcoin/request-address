@@ -6,7 +6,8 @@
     "bitcoin",
     "address",
     "request",
-    "protocol"
+    "protocol",
+    "slip24"
   ],
   "main": "dist/index.js",
   "files": [
@@ -26,9 +27,12 @@
     "dev": "yarn tsc --watch",
     "build": "tsc",
     "prepublish": "npm run build",
-    "test": "echo \"Error: no tests available yet\" && exit 1"
+    "test": "jest"
   },
   "devDependencies": {
-    "typescript": "^4.8.4"
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
   }
 }
