@@ -14,7 +14,7 @@ describe('slip24 payment request', () => {
           text: 'Hello World!',
         }],
         outputs: [{
-          bitcoinAddress: 'tb1q2q0j6gmfxynj40p0kxsr9jkagcvgpuqvqynnup',
+          address: 'tb1q2q0j6gmfxynj40p0kxsr9jkagcvgpuqvqynnup',
           amount: 123456,
         }],
         signature: 'abc',

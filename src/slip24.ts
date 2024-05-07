@@ -14,12 +14,12 @@ export type Slip24 = {
     coinPurchase: {
       coinType: number,
       amount: string,
-      bitcoinAddress: string,
+      address: string,
     },
   }>,
   outputs: Array<{
     amount: number,
-    bitcoinAddress: string,
+    address: string,
   }>,
   signature: string,
 };
@@ -90,9 +90,9 @@ export function parseSlip24(value: any): Slip24 | null {
         throw new Error('amount invalid');
       }
 
-      const { bitcoinAddress } = coinPurchase;
-      if (!isString(bitcoinAddress)) {
-        throw new Error('bitcoin address invalid');
+      const { address } = coinPurchase;
+      if (!isString(address)) {
+        throw new Error('address invalid');
       }
     } else {
       throw new Error('unsupported type');
@@ -114,9 +114,9 @@ export function parseSlip24(value: any): Slip24 | null {
       throw new Error('amount invalid');
     }
 
-    const { bitcoinAddress } = output;
-    if (!isString(bitcoinAddress)) {
-      throw new Error('bitcoin address invalid');
+    const { address } = output;
+    if (!isString(address)) {
+      throw new Error('address invalid');
     }
   }
 

@@ -20,7 +20,7 @@ describe('parse message', () => {
             text: 'Elderberries',
           }],
           outputs: [{
-            bitcoinAddress: 'tb1q2q0j6gmfxynj40p0kxsr9jkagcvgpuqvqynnup',
+            address: 'tb1q2q0j6gmfxynj40p0kxsr9jkagcvgpuqvqynnup',
             amount: 1000000,
           }],
           signature: 'abc',

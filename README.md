@@ -83,7 +83,7 @@ A service or wallet sends a `paymentRequest`:
       "text": "Elderberries"
     }],
     "outputs": [{
-      "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
+      "address": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
       "amount": 1000000
     }],
     "signature": "MEQCIH+0V4j4DTzT4y9EE9XHjQlyRfwHnnVQL9NFFYVCta1PAiAW0mlS4YtDzNzwJ0gR8ApKzdIKmSBKzClnxyFFp84oig=="
@@ -232,12 +232,12 @@ type Slip24 = {
     coinPurchase: {
       coinType: number,
       amount: string,
-      bitcoinAddress: string,
+      address: string,
     },
   }>,
   outputs: Array<{
     amount: number,
-    bitcoinAddress: string,
+    address: string,
   }>,
   signature: string,
 };
