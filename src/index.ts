@@ -1,6 +1,8 @@
 import { parseSlip24, type Slip24 } from './slip24';
 import { isBoolean, isLiteral, isNull, isNullish, isNumber, isObject, isOneOf, isString } from './utils';
 
+export { type Slip24 } from './slip24';
+
 export enum MessageVersion {
   V0 = '0',
 }
