@@ -112,7 +112,8 @@ type Message =
   | VerifyAddressV0Message
   | AddressV0Message
   | ExtendedPublicKeyV0Message
-  | PaymentRequestV0Message;
+  | PaymentRequestV0Message
+  | CloseV0Message;
 ```
 
 ### `RequestAddressV0Message`
@@ -183,6 +184,15 @@ type PaymentRequestV0Message = {
 };
 ```
 
+### `CloseV0Message`
+
+```ts
+type CloseV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.Close,
+};
+```
+
 ### `V0MessageScriptType`
 
 ```ts
@@ -204,6 +214,7 @@ enum V0MessageType {
   Address = 'address',
   ExtendedPublicKey = 'extendedPublicKey',
   PaymentRequest = 'paymentRequest',
+  Close = 'close',
 }
 ```
 

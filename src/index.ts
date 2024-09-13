@@ -14,6 +14,7 @@ export enum V0MessageType {
   Address = 'address',
   ExtendedPublicKey = 'extendedPublicKey',
   PaymentRequest = 'paymentRequest',
+  Close = 'close',
 }
 
 export enum V0MessageScriptType {
@@ -67,13 +68,19 @@ export type PaymentRequestV0Message = {
   slip24: Slip24 | null,
 };
 
+export type CloseV0Message = {
+  version: MessageVersion.V0,
+  type: V0MessageType.Close,
+};
+
 export type Message =
   | RequestAddressV0Message
   | RequestExtendedPublicKeyV0Message
   | VerifyAddressV0Message
   | AddressV0Message
   | ExtendedPublicKeyV0Message
-  | PaymentRequestV0Message;
+  | PaymentRequestV0Message
+  | CloseV0Message;
 
 export function serializeMessage(message: Message) {
   return JSON.stringify(message);
@@ -213,6 +220,11 @@ export function parseMessage(value: any): Message {
         label,
         message,
         slip24: parseSlip24(slip24)
+      };
+    } else if (type === V0MessageType.Close) {
+      return {
+        version,
+        type,
       };
     } else {
       throw new Error('unsupported type');
