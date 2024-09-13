@@ -1,6 +1,6 @@
 {
   "name": "request-address",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Request bitcoin address api messages",
   "keywords": [
     "bitcoin",
