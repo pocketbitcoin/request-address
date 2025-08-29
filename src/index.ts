@@ -10,7 +10,7 @@ import {
   isString,
 } from "./utils";
 
-export { type Slip24 } from "./slip24";
+export type { Slip24 } from "./slip24";
 
 export enum MessageVersion {
   V0 = "0",
