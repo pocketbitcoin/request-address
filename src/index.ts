@@ -23,6 +23,7 @@ export enum V0MessageType {
   Address = "address",
   ExtendedPublicKey = "extendedPublicKey",
   PaymentRequest = "paymentRequest",
+  Payment = "payment",
   Close = "close",
 }
 
@@ -77,6 +78,12 @@ export type PaymentRequestV0Message = {
   slip24: Slip24 | null;
 };
 
+export type PaymentV0Message = {
+  version: MessageVersion.V0;
+  type: V0MessageType.Payment;
+  txid: string;
+};
+
 export type CloseV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.Close;
@@ -89,6 +96,7 @@ export type Message =
   | AddressV0Message
   | ExtendedPublicKeyV0Message
   | PaymentRequestV0Message
+  | PaymentV0Message
   | CloseV0Message;
 
 export function serializeMessage(message: Message) {
@@ -238,6 +246,17 @@ export function parseMessage(value: any): Message {
         label,
         message,
         slip24: parseSlip24(slip24),
+      };
+    } else if (type === V0MessageType.Payment) {
+      const { txid } = object;
+      if (!isString(txid)) {
+        throw new Error("txid missing");
+      }
+
+      return {
+        version,
+        type,
+        txid,
       };
     } else if (type === V0MessageType.Close) {
       return {
