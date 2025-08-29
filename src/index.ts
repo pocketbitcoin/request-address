@@ -25,6 +25,7 @@ export enum V0MessageType {
   PaymentRequest = "paymentRequest",
   Payment = "payment",
   Close = "close",
+  Cancel = "cancel",
 }
 
 export enum V0MessageScriptType {
@@ -87,6 +88,11 @@ export type PaymentV0Message = {
 export type CloseV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.Close;
+export type CancelV0Message = {
+  version: MessageVersion.V0;
+  type: V0MessageType.Cancel;
+  correlationId?: string;
+  reason?: string | null;
 };
 
 export type Message =
@@ -97,7 +103,8 @@ export type Message =
   | ExtendedPublicKeyV0Message
   | PaymentRequestV0Message
   | PaymentV0Message
-  | CloseV0Message;
+  | CloseV0Message
+  | CancelV0Message;
 
 export function serializeMessage(message: Message) {
   return JSON.stringify(message);
@@ -257,6 +264,19 @@ export function parseMessage(value: any): Message {
         version,
         type,
         txid,
+      };
+    } else if (type === V0MessageType.Cancel) {
+      const { reason } = object;
+
+      if (!isString(reason) && !isNullish(reason)) {
+        throw new Error("reason invalid");
+      }
+
+      return {
+        version,
+        type,
+        ...(correlationId ? { correlationId } : {}),
+        ...(reason !== undefined ? { reason } : {}),
       };
     } else if (type === V0MessageType.Close) {
       return {
