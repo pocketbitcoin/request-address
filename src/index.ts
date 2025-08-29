@@ -38,6 +38,7 @@ export enum V0MessageScriptType {
 export type RequestAddressV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.RequestAddress;
+  correlationId?: string;
   withMessageSignature?: string | false | null;
   withExtendedPublicKey?: boolean | null;
   withScriptType?: V0MessageScriptType | null;
@@ -46,18 +47,21 @@ export type RequestAddressV0Message = {
 export type RequestExtendedPublicKeyV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.RequestExtendedPublicKey;
+  correlationId?: string;
   withScriptType?: V0MessageScriptType | null;
 };
 
 export type VerifyAddressV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.VerifyAddress;
+  correlationId?: string;
   bitcoinAddress: string;
 };
 
 export type AddressV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.Address;
+  correlationId?: string;
   bitcoinAddress: string;
   signature?: string | null;
   extendedPublicKey?: string | null;
@@ -66,12 +70,14 @@ export type AddressV0Message = {
 export type ExtendedPublicKeyV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.ExtendedPublicKey;
+  correlationId?: string;
   extendedPublicKey: string;
 };
 
 export type PaymentRequestV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.PaymentRequest;
+  correlationId?: string;
   bitcoinAddress: string;
   amount: number;
   label: string | null;
@@ -82,12 +88,16 @@ export type PaymentRequestV0Message = {
 export type PaymentV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.Payment;
+  correlationId?: string;
   txid: string;
 };
 
 export type CloseV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.Close;
+  correlationId?: string;
+};
+
 export type CancelV0Message = {
   version: MessageVersion.V0;
   type: V0MessageType.Cancel;
@@ -128,10 +138,14 @@ export function parseMessage(value: any): Message {
   const { version } = object;
 
   if (isLiteral(version, MessageVersion.V0 as const)) {
-    const { type } = object;
+    const { type, correlationId } = object;
 
     if (!isOneOf(type, ...Object.values(V0MessageType))) {
       throw new Error("invalid type");
+    }
+
+    if (!isString(correlationId) && correlationId !== undefined) {
+      throw new Error("correlation id invalid");
     }
 
     if (type === V0MessageType.RequestAddress) {
@@ -159,6 +173,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         withMessageSignature, // !true
         withExtendedPublicKey,
         withScriptType,
@@ -175,6 +190,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         withScriptType,
       };
     } else if (type === V0MessageType.VerifyAddress) {
@@ -186,6 +202,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         bitcoinAddress,
       };
     } else if (type === V0MessageType.Address) {
@@ -207,6 +224,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         bitcoinAddress,
         signature,
         extendedPublicKey,
@@ -220,6 +238,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         extendedPublicKey,
       };
     } else if (type === V0MessageType.PaymentRequest) {
@@ -248,6 +267,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         bitcoinAddress,
         amount,
         label,
@@ -263,6 +283,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
         txid,
       };
     } else if (type === V0MessageType.Cancel) {
@@ -282,6 +303,7 @@ export function parseMessage(value: any): Message {
       return {
         version,
         type,
+        ...(correlationId ? { correlationId } : {}),
       };
     } else {
       throw new Error("unsupported type");
