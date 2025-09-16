@@ -19,7 +19,8 @@ A service or wallet requests a bitcoin address request `requestAddress`:
   "type": "requestAddress",
   "withMessageSignature": "SX0KOveC",
   "withExtendedPublicKey": true,
-  "withScriptType": "p2wpkh"
+  "withScriptType": "p2wpkh",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
 }
 ```
 
@@ -31,7 +32,8 @@ The other service or wallet replies with the requested `address`:
   "type": "address",
   "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
   "signature": "Hzqs3cyg1YYF7M/m+U3BbDFykpZELv4xQhk4uWGCGAoOOq3kYKcR3uUzhXludmyEjQct7rAx3NxrWDBUmWcs/B8=",
-  "extendedPublicKey": "zpub6rjWsJX5PFBXVAivrvSX7QUwtHKPuudSYokPBiA35H6g6ue4YaLPNQYhSkiL1G8zGAhQNuiMi15k4xMKBy4jHPj99uWDnKihRuvGDycEGiD"
+  "extendedPublicKey": "zpub6rjWsJX5PFBXVAivrvSX7QUwtHKPuudSYokPBiA35H6g6ue4YaLPNQYhSkiL1G8zGAhQNuiMi15k4xMKBy4jHPj99uWDnKihRuvGDycEGiD",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
 }
 ```
 
@@ -41,7 +43,8 @@ A user can be prompted to verify received address with `verifyAddress`:
 {
   "version": "0",
   "type": "verifyAddress",
-  "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge"
+  "bitcoinAddress": "bc1qfd8phxz2vcazlfjtxqef94xjwulf5xyjghrxge",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
 }
 ```
 
@@ -51,7 +54,8 @@ A service or wallet can also request an extended public key `requestExtendedPubl
 {
   "version": "0",
   "type": "requestExtendedPublicKey",
-  "withScriptType": "p2wpkh"
+  "withScriptType": "p2wpkh",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
 }
 ```
 
@@ -61,7 +65,8 @@ The other service or wallet replies with the requested `extendedPublicKey`:
 {
   "version": "0",
   "type": "extendedPublicKey",
-  "extendedPublicKey": "zpub6rjWsJX5PFBXVAivrvSX7QUwtHKPuudSYokPBiA35H6g6ue4YaLPNQYhSkiL1G8zGAhQNuiMi15k4xMKBy4jHPj99uWDnKihRuvGDycEGiD"
+  "extendedPublicKey": "zpub6rjWsJX5PFBXVAivrvSX7QUwtHKPuudSYokPBiA35H6g6ue4YaLPNQYhSkiL1G8zGAhQNuiMi15k4xMKBy4jHPj99uWDnKihRuvGDycEGiD",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
 }
 ```
 
@@ -87,9 +92,35 @@ A service or wallet sends a `paymentRequest`:
       "amount": 1000000
     }],
     "signature": "MEQCIH+0V4j4DTzT4y9EE9XHjQlyRfwHnnVQL9NFFYVCta1PAiAW0mlS4YtDzNzwJ0gR8ApKzdIKmSBKzClnxyFFp84oig=="
-  }
+  },
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
 }
 ```
+
+The other service or wallet replies with the payment that was requested:
+
+```json
+{
+  "version": "0",
+  "type": "payment",
+  "txid": "4bec63963c6c573f4fb1f524e50c286c9e4243c8d30ec33687a0e9dbdff1f43e",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
+}
+```
+
+If a request can not be fulfilled, the other service should reply with a `cancel` message and an optional reason:
+
+```json
+{
+  "version": "0",
+  "type": "cancel",
+  "reason": "rejected_by_user",
+  "correlationId": "23735ca1-542d-469f-85a3-902bc1afc100"
+}
+```
+
+The `correlationId` introduced in v0.0.11 is a unique identifier for a request. It is used to match the request with the response.
+To ensure backward compatibility, the requester should always listen for all messages that do not have a `correlationId` field.
 
 ## API
 
@@ -113,18 +144,21 @@ type Message =
   | AddressV0Message
   | ExtendedPublicKeyV0Message
   | PaymentRequestV0Message
-  | CloseV0Message;
+  | PaymentV0Message
+  | CloseV0Message
+  | CancelV0Message;
 ```
 
 ### `RequestAddressV0Message`
 
 ```ts
 type RequestAddressV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.RequestAddress,
-  withMessageSignature?: string | false | null,
-  withExtendedPublicKey?: boolean | null,
-  withScriptType?: V0MessageScriptType | null,
+  version: MessageVersion.V0;
+  type: V0MessageType.RequestAddress;
+  correlationId?: string;
+  withMessageSignature?: string | false | null;
+  withExtendedPublicKey?: boolean | null;
+  withScriptType?: V0MessageScriptType | null;
 };
 ```
 
@@ -132,9 +166,10 @@ type RequestAddressV0Message = {
 
 ```ts
 type RequestExtendedPublicKeyV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.RequestExtendedPublicKey,
-  withScriptType?: V0MessageScriptType | null,
+  version: MessageVersion.V0;
+  type: V0MessageType.RequestExtendedPublicKey;
+  correlationId?: string;
+  withScriptType?: V0MessageScriptType | null;
 };
 ```
 
@@ -142,9 +177,10 @@ type RequestExtendedPublicKeyV0Message = {
 
 ```ts
 type VerifyAddressV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.VerifyAddress,
-  bitcoinAddress: string,
+  version: MessageVersion.V0;
+  type: V0MessageType.VerifyAddress;
+  correlationId?: string;
+  bitcoinAddress: string;
 };
 ```
 
@@ -152,11 +188,12 @@ type VerifyAddressV0Message = {
 
 ```ts
 type AddressV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.Address,
-  bitcoinAddress: string,
-  signature?: string | null,
-  extendedPublicKey?: string | null,
+  version: MessageVersion.V0;
+  type: V0MessageType.Address;
+  correlationId?: string;
+  bitcoinAddress: string;
+  signature?: string | null;
+  extendedPublicKey?: string | null;
 };
 ```
 
@@ -164,9 +201,10 @@ type AddressV0Message = {
 
 ```ts
 type ExtendedPublicKeyV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.ExtendedPublicKey,
-  extendedPublicKey: string,
+  version: MessageVersion.V0;
+  type: V0MessageType.ExtendedPublicKey;
+  correlationId?: string;
+  extendedPublicKey: string;
 };
 ```
 
@@ -174,13 +212,25 @@ type ExtendedPublicKeyV0Message = {
 
 ```ts
 type PaymentRequestV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.PaymentRequest,
-  bitcoinAddress: string,
-  amount: number,
-  label: string | null,
-  message: string | null,
-  slip24: Slip24 | null,
+  version: MessageVersion.V0;
+  type: V0MessageType.PaymentRequest;
+  correlationId?: string;
+  bitcoinAddress: string;
+  amount: number;
+  label: string | null;
+  message: string | null;
+  slip24: Slip24 | null;
+};
+```
+
+### `PaymentV0Message`
+
+```ts
+type PaymentV0Message = {
+  version: MessageVersion.V0;
+  type: V0MessageType.Payment;
+  correlationId?: string;
+  txid: string;
 };
 ```
 
@@ -188,8 +238,20 @@ type PaymentRequestV0Message = {
 
 ```ts
 type CloseV0Message = {
-  version: MessageVersion.V0,
-  type: V0MessageType.Close,
+  version: MessageVersion.V0;
+  type: V0MessageType.Close;
+  correlationId?: string;
+};
+```
+
+### `CancelV0Message`
+
+```ts
+type CancelV0Message = {
+  version: MessageVersion.V0;
+  type: V0MessageType.Cancel;
+  correlationId?: string;
+  reason?: string | null;
 };
 ```
 
@@ -208,13 +270,15 @@ enum V0MessageScriptType {
 
 ```ts
 enum V0MessageType {
-  RequestAddress = 'requestAddress',
-  RequestExtendedPublicKey = 'requestExtendedPublicKey',
-  VerifyAddress = 'verifyAddress',
-  Address = 'address',
-  ExtendedPublicKey = 'extendedPublicKey',
-  PaymentRequest = 'paymentRequest',
-  Close = 'close',
+  RequestAddress = "requestAddress",
+  RequestExtendedPublicKey = "requestExtendedPublicKey",
+  VerifyAddress = "verifyAddress",
+  Address = "address",
+  ExtendedPublicKey = "extendedPublicKey",
+  PaymentRequest = "paymentRequest",
+  Payment = "payment",
+  Close = "close",
+  Cancel = "cancel",
 }
 ```
 
